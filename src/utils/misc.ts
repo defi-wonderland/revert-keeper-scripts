@@ -1,8 +1,9 @@
-import process from 'node:process';
+import process from 'dotenv';
 import type {UnsubscribeFunction} from '@keep3r-network/keeper-scripting-utils';
 
 export function getEnvVariable(name: string): string {
-  const value: string | undefined = process.env[name];
+  const env = process.config().parsed;
+  const value: string | undefined = env![name];
   if (!value) throw new Error(`Environment variable ${name} not found`);
   return value;
 }

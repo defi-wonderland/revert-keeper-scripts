@@ -1,7 +1,7 @@
-import {getMainnetSdk, getOptimismSdk} from '@dethcrypto/eth-sdk-client';
+import {getMainnetSdk} from '@dethcrypto/eth-sdk-client';
 import {defaultAbiCoder} from 'ethers/lib/utils';
 import type {BigNumber} from 'ethers';
-import {CHAIN_ID_MAINNET, ADDRESS_ZERO, BLOCK_CREATION_CONTRACT} from '../utils/constants';
+import {ADDRESS_ZERO, BLOCK_CREATION_CONTRACT} from '../utils/constants';
 import {loadInitialSetup} from './setup';
 
 const {provider, txSigner} = loadInitialSetup();
@@ -10,7 +10,7 @@ const {provider, txSigner} = loadInitialSetup();
 const compoundorMainnet = getMainnetSdk(txSigner).compoundor;
 const nonfungiblePositionManagerMainnet = getMainnetSdk(txSigner).nonfungiblePositionManager;
 
-updateCache(CHAIN_ID_MAINNET);
+updateCache(1);
 
 /**
  * @notice Fetches the tokensId which contains token0 or token1 includes in our whitelist.

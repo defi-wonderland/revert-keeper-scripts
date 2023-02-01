@@ -1,18 +1,12 @@
 import type {BlockListener, Flashbots, UnsubscribeFunction} from '@keep3r-network/keeper-scripting-utils';
-import type {BigNumber, providers, Wallet} from 'ethers';
+import type {BigNumber} from 'ethers';
 
-export type Address = string;
 export type LastWorkAtMap = Record<string, BigNumber>;
 export type UnsubscribePoolManagerMap = Record<string, UnsubscribeFunction>;
 export type WorkDataMap = Record<string, string>;
 export type TokenIdWorkInProgressMap = Record<string, boolean>;
-
-export type InitialSetup = {
-  provider: providers.JsonRpcProvider; // TODO switch to wss on prod
-  // provider: providers.WebSocketProvider;
-  txSigner: Wallet;
-  bundleSigner: Wallet;
-};
+export type ChainId = number;
+export type Address = string;
 
 export type RunSetup = {
   blockListener: BlockListener;
@@ -21,8 +15,6 @@ export type RunSetup = {
   unsubscribePoolManager: UnsubscribePoolManagerMap;
   workData: WorkDataMap;
 };
-
-export type TryToWorkTokenId = (tokenId: string, flashFlashbots: Flashbots) => Promise<void>;
 
 export type PositionData = {
   nonce: BigNumber;
@@ -37,4 +29,9 @@ export type PositionData = {
   feeGrowthInside1LastX128: BigNumber;
   tokensOwed0: BigNumber;
   tokensOwed1: BigNumber;
+};
+
+export const FLASHBOTS_RPC_BY_CHAINID: Record<ChainId, string> = {
+  1: 'https://relay.flashbots.net',
+  5: 'https://relay-goerli.flashbots.net',
 };

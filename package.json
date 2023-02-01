@@ -17,7 +17,8 @@
   "private": true,
   "scripts": {
     "postinstall": "eth-sdk",
-    "start": "ts-node src/shared/test.ts",
+    "start:mainnet": "ts-node src/compound.ts",
+    "start:optimism": "ts-node src/compound-optimism.ts",
     "build": "eth-sdk && tsc",
     "prod": "node dist/src/upkeep-job.js",
     "lint": "xo",
