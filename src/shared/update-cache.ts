@@ -1,4 +1,4 @@
-import type {Contract} from 'ethers';
+import type {BigNumber, Contract} from 'ethers';
 import {ethers} from 'ethers';
 import {defaultAbiCoder} from 'ethers/lib/utils';
 import {bytecode} from '../../solidity/artifacts/contracts/BatchPositions.sol/BatchPositions.json';
@@ -38,12 +38,6 @@ export async function updateCache(compoundJob: Contract, compoundor: Contract, n
 
   // Call the deployment transaction with the payload
   const returnedData = await compoundJob.provider.call({data: payload});
-  const [decoded] = ethers.utils.defaultAbiCoder.decode(['uint256[]'], returnedData);
-
-  const decodedToNumber: number[] = [];
-  for (const [i, element] of decoded.entries()) {
-    decodedToNumber[i] = Number.parseInt(element as unknown as string, 10);
-  }
-
-  return decodedToNumber;
+  const [sanitizedTokensId] = ethers.utils.defaultAbiCoder.decode(['uint256[]'], returnedData) as [BigNumber[]];
+  return sanitizedTokensId.map(tokenId => tokenId.toNumber());
 }

@@ -72,7 +72,7 @@ export const tryToWorkOnFlashbots = async (
   blockListener: BlockListener,
   flashbots: Flashbots | undefined,
 ) => {
-  console.log('Start Working on compound job:', tokenId);
+  console.log('Start Working on compound job with token ID:', tokenId);
   if (!flashbots) return;
 
   const txSigner = new Wallet(getEnvVariable('TX_SIGNER_MAINNET_PRIVATE_KEY'), provider);
@@ -196,7 +196,7 @@ export const tryToWorkOnMempool = async (
   blockListener: BlockListener,
   flashbot: Flashbots | undefined,
 ) => {
-  console.log('Start Working on compound job:', tokenId);
+  console.log('Start Working on compound job with token ID:', tokenId);
 
   let txInProgress = false;
 
