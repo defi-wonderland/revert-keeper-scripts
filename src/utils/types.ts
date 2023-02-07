@@ -1,4 +1,4 @@
-import type {BlockListener, Flashbots, UnsubscribeFunction} from '@keep3r-network/keeper-scripting-utils';
+import type {BlockListener, UnsubscribeFunction} from '@keep3r-network/keeper-scripting-utils';
 import type {BigNumber} from 'ethers';
 
 export type LastWorkAtMap = Record<string, BigNumber>;
@@ -14,21 +14,6 @@ export type RunSetup = {
   tokenIdWorkInProgress: TokenIdWorkInProgressMap;
   unsubscribePoolManager: UnsubscribePoolManagerMap;
   workData: WorkDataMap;
-};
-
-export type PositionData = {
-  nonce: BigNumber;
-  operator: string;
-  token0: string;
-  token1: string;
-  fee: number;
-  tickLower: number;
-  tickUpper: number;
-  liquidity: BigNumber;
-  feeGrowthInside0LastX128: BigNumber;
-  feeGrowthInside1LastX128: BigNumber;
-  tokensOwed0: BigNumber;
-  tokensOwed1: BigNumber;
 };
 
 export const FLASHBOTS_RPC_BY_CHAINID: Record<ChainId, string> = {

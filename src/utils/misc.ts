@@ -8,9 +8,9 @@ export function getEnvVariable(name: string): string {
   return value;
 }
 
-export function stopSubscription(storage: Record<string, UnsubscribeFunction>, strategy: number): void {
-  if (storage[strategy]) {
-    storage[strategy]();
-    delete storage[strategy];
+export function stopSubscription(storage: Record<string, UnsubscribeFunction>, tokenId: number): void {
+  if (storage[tokenId]) {
+    storage[tokenId]();
+    delete storage[tokenId];
   }
 }

@@ -1,45 +1,41 @@
-import type {Contract, providers} from 'ethers';
-import type {Flashbots} from '@keep3r-network/keeper-scripting-utils';
+import type {Contract, providers, BigNumber} from 'ethers';
+import {ethers} from 'ethers';
 import {defaultAbiCoder} from 'ethers/lib/utils';
-import type {Address, PositionData} from '../utils/types';
-import {ADDRESS_ZERO} from '../utils/constants';
+import BatchPositions from '../../solidity/artifacts/contracts/BatchPositions.sol/BatchPositions.json';
 
-export async function deleteSanitizedToken(
-  provider: providers.JsonRpcProvider,
-  sanitizedTokensId: number[],
-  compoundor: Contract,
-): Promise<number[]> {
+export async function deleteSanitizedToken(provider: providers.JsonRpcProvider, oldTokenId: number, compoundor: Contract): Promise<number> {
   // Listen and react to event token withdrawn
   provider.on(compoundor.filters.TokenWithdrawn(), async (eventData) => {
     const tokenIdWithdraw: number = Number.parseInt(defaultAbiCoder.decode(['address', 'address', 'uint256'], eventData.data)[2] as string, 10);
-    console.log('^^^^^^^^^^^^^^^^^ TOKEN ID WIHDRAWN FROM COMPOUNDOR ^^^^^^^^^^^^^^^^^', tokenIdWithdraw);
-    const index = sanitizedTokensId.indexOf(tokenIdWithdraw);
-    sanitizedTokensId.splice(index, 1);
+    oldTokenId = tokenIdWithdraw;
   });
-  return sanitizedTokensId;
+  return oldTokenId;
 }
 
 export async function addSanitizedToken(
   provider: providers.JsonRpcProvider,
-  sanitizedTokensId: number[],
   newTokenId: number,
   compoundJob: Contract,
   compoundor: Contract,
   nonfungiblePositionManager: Contract,
-): Promise<[number[], number]> {
+): Promise<number> {
   // Listen and react to events like creation of new poolManager.
   provider.on(compoundor.filters.TokenDeposited(), async (eventData) => {
     const tokenIdDeposited: number = Number.parseInt(defaultAbiCoder.decode(['address', 'uint256'], eventData.data)[1] as string, 10);
-    const position: PositionData = await nonfungiblePositionManager.positions(tokenIdDeposited);
-    const whitelistedTokens = new Set<Address>(await compoundJob.getWhitelistedTokens());
+    const beforeNewSanitizedTokensId: number[] = [];
+    beforeNewSanitizedTokensId[0] = tokenIdDeposited;
+    const inputData = ethers.utils.defaultAbiCoder.encode(
+      ['address', 'address', 'uint256[]'],
+      [compoundJob.address, nonfungiblePositionManager.address, beforeNewSanitizedTokensId],
+    );
 
-    if (whitelistedTokens.has(position.token0) || whitelistedTokens.has(position.token1)) {
-      const ownerAddress = await compoundor.ownerOf(tokenIdDeposited);
+    // Generate payload from input data
+    const payload = BatchPositions.bytecode.concat(inputData.slice(2));
 
-      if (ownerAddress !== ADDRESS_ZERO) {
-        sanitizedTokensId.push(tokenIdDeposited);
-      }
-    }
+    // Call the deployment transaction with the payload
+    const returnedData = await compoundJob.provider.call({data: payload});
+    const [afterSanitizedTokensId] = ethers.utils.defaultAbiCoder.decode(['uint256[]'], returnedData) as [BigNumber[]];
+    newTokenId = afterSanitizedTokensId.map((tokenId) => tokenId.toNumber())[0];
   });
-  return [sanitizedTokensId, newTokenId];
+  return newTokenId;
 }

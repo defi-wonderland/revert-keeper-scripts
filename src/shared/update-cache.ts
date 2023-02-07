@@ -39,5 +39,5 @@ export async function updateCache(compoundJob: Contract, compoundor: Contract, n
   // Call the deployment transaction with the payload
   const returnedData = await compoundJob.provider.call({data: payload});
   const [sanitizedTokensId] = ethers.utils.defaultAbiCoder.decode(['uint256[]'], returnedData) as [BigNumber[]];
-  return sanitizedTokensId.map(tokenId => tokenId.toNumber());
+  return sanitizedTokensId.map((tokenId) => tokenId.toNumber());
 }
