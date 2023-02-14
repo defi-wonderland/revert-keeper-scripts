@@ -71,7 +71,7 @@ export async function runJob(
         tokenIdWorkInProgress[tokenId] = true;
 
         try {
-          await broadcastMethod(compoundJob, 'work(uint256, address)', [tokenId, compoundorAddress], isWorkable);
+          await broadcastMethod(compoundJob, 'work(uint256,address)', [tokenId, compoundorAddress], isWorkable);
         } catch (error: any) {
           console.log('===== Tx FAILED =====', tokenId);
           console.log(`Transaction failed. Reason: ${error.message}`);

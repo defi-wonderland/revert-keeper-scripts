@@ -28,7 +28,7 @@ export class MempoolBroadcastor {
     // Send the transaction
     await sendTx({
       contractCall: () =>
-        jobContract.work[workMethod](methodArguments, {
+        jobContract[workMethod](...methodArguments, {
           ...options,
         }),
     });
