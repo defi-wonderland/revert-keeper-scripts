@@ -19,6 +19,7 @@
     "postinstall": "eth-sdk",
     "start:mainnet": "ts-node src/compound.ts",
     "start:optimism": "ts-node src/compound-optimism.ts",
+    "start:polygon": "ts-node src/compound-polygon.ts",
     "build": "eth-sdk && tsc",
     "prod": "node dist/src/upkeep-job.js",
     "lint": "xo",

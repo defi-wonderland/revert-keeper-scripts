@@ -18,6 +18,7 @@ export async function runJob(
     methodArguments: Array<number | string>, // TokenId, compoundor.address
     isWorkable: boolean,
   ) => Promise<void>,
+  fromBlockOrBlockHash?: providers.BlockTag
 ) {
   const {nonfungiblePositionManager, compoundor} = getMainnetSdk(txSigner);
   const compoundors: string[] = await compoundJob.getWhitelistedCompoundors();
@@ -27,7 +28,7 @@ export async function runJob(
 
   for (const compoundorAddress of compoundors) {
     const compoundorContract = compoundor.attach(compoundorAddress);
-    const sanitizedTokensId: number[] = await updateCache(compoundJob, compoundorContract, nonfungiblePositionManager);
+    const sanitizedTokensId: number[] = await updateCache(compoundJob, compoundorContract, nonfungiblePositionManager, fromBlockOrBlockHash);
 
     // Creates a mapping that keeps track of whether we have sent a bundle to try to work a job.
     const tokenIdWorkInProgress: Record<number, boolean> = {};

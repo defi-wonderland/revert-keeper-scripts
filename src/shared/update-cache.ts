@@ -1,4 +1,4 @@
-import type {BigNumber, Contract} from 'ethers';
+import {BigNumber, Contract} from 'ethers';
 import {ethers} from 'ethers';
 import {defaultAbiCoder} from 'ethers/lib/utils';
 import {bytecode} from '../../solidity/artifacts/contracts/BatchPositions.sol/BatchPositions.json';
@@ -6,13 +6,13 @@ import {bytecode} from '../../solidity/artifacts/contracts/BatchPositions.sol/Ba
 /**
  * @notice Fetches the tokensId which contains token0 or token1 includes in our whitelist.
  */
-export async function updateCache(compoundJob: Contract, compoundor: Contract, nonfungiblePositionManager: Contract): Promise<number[]> {
+export async function updateCache(compoundJob: Contract, compoundor: Contract, nonfungiblePositionManager: Contract, fromBlockOrBlockHash?: ethers.providers.BlockTag): Promise<number[]> {
   const beforeSanitizedTokensId: number[] = [];
 
   const evtDepositFilter = compoundor.filters.TokenDeposited();
-  const depositEvents = await compoundor.queryFilter(evtDepositFilter);
+  const depositEvents = await compoundor.queryFilter(evtDepositFilter, fromBlockOrBlockHash);
   const evtWithdrawFilter = compoundor.filters.TokenWithdrawn();
-  const withdrawalEvents = await compoundor.queryFilter(evtWithdrawFilter);
+  const withdrawalEvents = await compoundor.queryFilter(evtWithdrawFilter, fromBlockOrBlockHash);
 
   const filteredResults = depositEvents.filter((addEvent) => {
     const wasLaterWithdrawn = withdrawalEvents.find(

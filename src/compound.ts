@@ -14,8 +14,7 @@ import {BURST_SIZE, FUTURE_BLOCKS, SKIPPING_FACTOR, GAS_LIMIT, PRIORITY_FEE_IN_W
 const provider = new providers.JsonRpcProvider(getEnvVariable('RPC_MAINNET_WSS_URI'));
 const txSigner = new Wallet(getEnvVariable('TX_SIGNER_MAINNET_PRIVATE_KEY'), provider);
 const bundleSigner = new Wallet(getEnvVariable('BUNDLE_SIGNER_MAINNET_PRIVATE_KEY'), provider);
-// Contracts
-const compoundJob = new Contract('COMPOUND_JOB', ICompoundKeep3rJobABI, txSigner);
+const compoundJob = new Contract('UNIMPLEMENTED_COMPOUND_JOB', ICompoundKeep3rJobABI, txSigner);
 
 (async () => {
   // Get the chain Id
