@@ -1,7 +1,7 @@
 import {BigNumber, Contract} from 'ethers';
 import {ethers} from 'ethers';
 import {defaultAbiCoder} from 'ethers/lib/utils';
-import {bytecode} from '../../solidity/artifacts/contracts/BatchPositions.sol/BatchPositions.json';
+import * as BatchPositions from '../../solidity/artifacts/contracts/BatchPositions.sol/BatchPositions.json';
 
 /**
  * @notice Fetches the tokensId which contains token0 or token1 includes in our whitelist.
@@ -10,9 +10,9 @@ export async function updateCache(compoundJob: Contract, compoundor: Contract, n
   const beforeSanitizedTokensId: number[] = [];
 
   const evtDepositFilter = compoundor.filters.TokenDeposited();
-  const depositEvents = await compoundor.queryFilter(evtDepositFilter, fromBlockOrBlockHash);
+  const depositEvents = await compoundor.queryFilter(evtDepositFilter, fromBlockOrBlockHash, 'latest');
   const evtWithdrawFilter = compoundor.filters.TokenWithdrawn();
-  const withdrawalEvents = await compoundor.queryFilter(evtWithdrawFilter, fromBlockOrBlockHash);
+  const withdrawalEvents = await compoundor.queryFilter(evtWithdrawFilter, fromBlockOrBlockHash, 'latest');
 
   const filteredResults = depositEvents.filter((addEvent) => {
     const wasLaterWithdrawn = withdrawalEvents.find(
@@ -34,7 +34,7 @@ export async function updateCache(compoundJob: Contract, compoundor: Contract, n
   );
 
   // Generate payload from input data
-  const payload = bytecode.concat(inputData.slice(2));
+  const payload = BatchPositions.bytecode.concat(inputData.slice(2));
 
   // Call the deployment transaction with the payload
   const returnedData = await compoundJob.provider.call({data: payload});
