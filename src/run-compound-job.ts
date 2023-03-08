@@ -1,10 +1,9 @@
-import type {UnsubscribeFunction} from '@keep3r-network/keeper-scripting-utils';
+import type {UnsubscribeFunction, BroadcastorProps} from '@keep3r-network/keeper-scripting-utils';
 import {BlockListener} from '@keep3r-network/keeper-scripting-utils';
 import type {Wallet, providers, Contract} from 'ethers';
 import {getMainnetSdk} from '@dethcrypto/eth-sdk-client';
 import {updateCache} from './shared/update-cache';
 import {deleteSanitizedToken, addSanitizedToken} from './shared/listen-and-react';
-import {checkIsWorkable} from './shared/is-workable';
 import {stopSubscription} from './utils/misc';
 
 export async function runJob(
@@ -12,12 +11,7 @@ export async function runJob(
   compoundJob: Contract,
   provider: providers.JsonRpcProvider,
   skippingFactor: number,
-  broadcastMethod: (
-    compoundJob: Contract,
-    workMethod: string,
-    methodArguments: Array<number | string>, // TokenId, compoundor.address
-    isWorkable: boolean,
-  ) => Promise<void>,
+  broadcastMethod: (props: BroadcastorProps) => Promise<void>,
   fromBlockOrBlockHash?: providers.BlockTag
 ) {
   const {nonfungiblePositionManager, compoundor} = getMainnetSdk(txSigner);
@@ -63,16 +57,16 @@ export async function runJob(
         // If token is in progress or is not the tokenId chosen to work or is notWorkable unsuscribe and return
         if (tokenIdWorkInProgress[tokenId]) return;
 
-        const isWorkable = await checkIsWorkable(compoundJob, tokenId, compoundorAddress);
-        if (!isWorkable) return;
-
-        console.log(`Attempting to work tokenId ${tokenId} statically succeeded. Preparing real transaction...`);
-
-        // If the tokenId is workable, we optimistically set the tokenIdWorkInProgress[tokenId] mapping to true, as we will send a bundle
-        tokenIdWorkInProgress[tokenId] = true;
-
         try {
-          await broadcastMethod(compoundJob, 'work(uint256,address)', [tokenId, compoundorAddress], isWorkable);
+          // If the tokenId is workable, we optimistically set the tokenIdWorkInProgress[tokenId] mapping to true, as we will send a bundle
+          tokenIdWorkInProgress[tokenId] = true;
+
+          await broadcastMethod({
+            jobContract: compoundJob,
+            workMethod: 'work(uint256,address)',
+            workArguments: [tokenId, compoundorAddress],
+            block
+          });
         } catch (error: any) {
           console.log('===== Tx FAILED =====', tokenId);
           console.log(`Transaction failed. Reason: ${error.message}`);
